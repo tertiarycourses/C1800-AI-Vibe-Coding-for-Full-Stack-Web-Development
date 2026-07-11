@@ -20,6 +20,7 @@ TITLE='AI Vibe Coding for Full Stack Web Development'; CODE='C1800'
 BLUE='1F6FEB'; TEAL='10B981'; INK='161B26'; GREY='5B6372'; LIGHT='F5F8FC'; VIOLET='7C3AED'
 REPO='https://github.com/tertiarycourses/C1800-AI-Vibe-Coding-for-Full-Stack-Web-Development'
 LOGO=OUT/'assets/tertiary-infotech-logo.png'
+VISUALS=OUT/'assets/visuals'
 
 topics=[
 ('01','Vibe Coding Principles for Full Stack Development',
@@ -186,6 +187,13 @@ def build_ppt():
   shape(s,MSO_SHAPE.OVAL,11.85,-.32,1.15,1.15,'F1F6FF','F1F6FF'); shape(s,MSO_SHAPE.OVAL,12.42,.18,.42,.42,'D9F7EA','D9F7EA')
   tb(s,.65,.35,12,.3,kicker.upper(),11,True,TEAL); tb(s,.65,.78,12,1,title,28,True)
   tb(s,.65,7.12,11.7,.18,f'{TITLE} · {CODE}     © 2026 Tertiary Infotech Academy Pte Ltd',8,False,GREY); tb(s,12.25,7.08,.4,.2,str(len(prs.slides)),8,False,GREY,PP_ALIGN.RIGHT); return s
+ def visual_story(title,kicker,image_name,takeaways):
+  s=shell(title,kicker); img=VISUALS/image_name
+  if img.exists(): s.shapes.add_picture(str(img),I(.7),I(1.68),I(8.15),I(4.58))
+  shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,9.08,1.68,3.52,4.58,'F5F8FC','D7E3F5')
+  tb(s,9.42,1.98,2.8,.25,'LOOK → NOTICE → EXPLAIN',10,True,TEAL)
+  for i,x in enumerate(takeaways):
+   y=2.55+i*1.05; shape(s,MSO_SHAPE.OVAL,9.4,y,.48,.48,palette[i]); tb(s,9.4,y+.12,.48,.18,str(i+1),10,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,10.05,y-.02,2.15,.72,x,13,True,INK)
  def bullets(title,kicker,items):
   s=shell(title,kicker); items=items[:5]
   # Prompt contracts and core loops become connected process diagrams.
@@ -237,13 +245,17 @@ def build_ppt():
   s=shell(title,kicker); c=s.shapes.add_shape(MSO_SHAPE.OVAL,I(.75),I(2),I(1.15),I(1.15)); c.fill.solid(); c.fill.fore_color.rgb=C.from_string(BLUE); c.line.fill.background(); tb(s,.75,2.27,1.15,.5,str(n),24,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,2.25,1.95,9.8,3.2,text,23,True if n==1 else False,INK)
  s=prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid(); s.background.fill.fore_color.rgb=C(255,255,255)
  if LOGO.exists(): s.shapes.add_picture(str(LOGO),I(.72),I(.42),I(.72),I(.72))
- tb(s,1.58,.62,4,.3,'TERTIARY INFOTECH ACADEMY',12,True,BLUE); tb(s,.75,1.55,11.5,1.7,TITLE,34,True); tb(s,.75,3.45,6,.5,f'Course Code: {CODE}',20,True,TEAL); tb(s,.75,4.25,10,.6,'Agentic AI Loop Engineering · Build · Verify · Ship',23,False,GREY); tb(s,.75,6.5,9,.3,'2 days · 15 hours · Intermediate · Version 2.0',12,False,GREY)
+ tb(s,1.58,.62,4,.3,'TERTIARY INFOTECH ACADEMY',12,True,BLUE); tb(s,.75,1.5,5.75,2.0,TITLE,31,True); tb(s,.75,3.75,5.2,.5,f'Course Code: {CODE}',18,True,TEAL); tb(s,.75,4.48,5.6,.9,'Agentic AI Loop Engineering\nBuild · Verify · Ship',21,False,GREY); tb(s,.75,6.5,5.7,.3,'2 days · 15 hours · Intermediate · Version 2.0',12,False,GREY)
+ if (VISUALS/'agentic-loop.png').exists(): s.shapes.add_picture(str(VISUALS/'agentic-loop.png'),I(6.45),I(1.12),I(6.55),I(3.68))
  bullets('How adults learn in this course','LEARNING DESIGN',['See a complete demonstration with trainer think-aloud','Practise the same decision with scaffolding','Solve a changed boundary independently','Explain evidence to a peer','Commit a transferable checklist or checkpoint'])
  bullets('The Agentic AI Engineering Loop','CORE MODEL',['Frame — define observable success','Plan — expose assumptions and file scope','Generate — authorise a small increment','Inspect + Verify — apply judgement and evidence','Correct + Commit — diagnose, fix and preserve'])
  bullets('Course outcomes','COURSE OVERVIEW',['Engineer durable goals, context and prompts','Build an accessible typed full-stack vertical slice','Generate tests, production builds and CI/CD gates','Create non-WSQ skills, hooks and bounded subagents','Implement MCP tools and orchestrate a release'])
  bullets('TaskFlow capstone architecture','COURSE OVERVIEW',['React + TypeScript user interface','Express API with schema validation','SQLite migrations and parameterised persistence','Shared contracts and automated tests','Docker, GitHub Actions and cloud release'])
+ visual_story('See the whole system before you build','CAPSTONE VISUAL','full-stack-architecture.png',['Trace data end to end','Locate trust boundaries','Name the evidence at each layer'])
+ topic_visuals={'01':('agentic-loop.png',['Human judgement directs the loop','Every stage leaves evidence','Commit only verified work']),'02':('full-stack-architecture.png',['Contracts connect the layers','Tests observe boundaries','Security travels with data']),'03':('cicd-pipeline.png',['Gates stop defects early','Deployments stay observable','Rollback remains deliberate']),'04':('multi-agent-mcp.png',['Delegation stays bounded','Tools enforce safe access','One lead reconciles the release'])}
  for tn,topic,concepts,labs in topics:
   s=shell(f'Topic {tn}',topic); tb(s,.7,1.9,2,1.3,tn,70,True,'DCE9FF'); tb(s,2.55,2.05,9.7,2.0,topic,34,True); tb(s,2.6,4.1,9,.8,f'{len(labs)} connected labs · concept → demonstration → practice → transfer',18,False,GREY)
+  img,takes=topic_visuals[tn]; visual_story(topic,f'TOPIC {tn} · VISUAL STORY',img,takes)
   bullets('Why this topic matters',f'TOPIC {tn}',[f'{c}: connect knowledge to an engineering decision.' for c in concepts])
   bullets('Concept map',f'TOPIC {tn}',concepts)
   bullets('Common failure patterns',f'TOPIC {tn}',['A polished solution to the wrong problem','Chat-only context that disappears next session','Broad generated diffs that cannot be reviewed','Happy-path tests that miss real boundaries','Automation without ownership or rollback'])

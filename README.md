@@ -10,7 +10,7 @@ Complete non-WSQ courseware for a practical, intermediate programme on building 
 
 ## Courseware
 
-- 233-slide PowerPoint deck covering all four published topics and 30 guided labs
+- 238-slide, image-rich PowerPoint deck covering all four published topics and 30 guided labs
 - Detailed 28,000+ word Learner Guide in DOCX and Markdown
 - Two-day Lesson Plan totalling 15 instructional hours
 - Thirty standalone lab sheets that progressively build the TaskFlow capstone
