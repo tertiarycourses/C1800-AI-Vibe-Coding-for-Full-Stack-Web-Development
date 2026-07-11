@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import re, sys
+from pptx import Presentation
 root=Path(sys.argv[1] if len(sys.argv)>1 else '.').resolve()
 deliverables=[root/'LEARNER-GUIDE.md',*sorted((root/'labs').rglob('*.md'))]
 prohibited=re.compile(r'\b(SSG|TRAQOM)\b|SkillsFuture funding',re.I); errors=[]
@@ -15,5 +16,8 @@ for folder in [root/'.codex/skills',root/'.claude/commands',root/'.claude/hooks'
 required=[root/'courseware'/f for f in ['C1800 AI Vibe Coding for Full Stack Web Development.pptx','C1800 AI Vibe Coding for Full Stack Web Development - Learner Guide.docx','Lesson Plan - C1800 AI Vibe Coding for Full Stack Web Development.docx']]
 for p in required:
     if not p.exists() or p.stat().st_size<10000: errors.append(f'missing or undersized: {p}')
+lab_count=len(list((root/'labs').rglob('*.md')))
+if lab_count < 20: errors.append(f'only {lab_count} labs; at least 20 required')
+if required[0].exists() and len(Presentation(required[0]).slides) <= 100: errors.append('PPT must exceed 100 slides')
 if errors: print('\n'.join(errors)); raise SystemExit(1)
-print(f'non-wsq post-hook passed: {len(deliverables)-1} labs and 3 primary artifacts')
+print(f'non-wsq post-hook passed: {lab_count} labs, {len(Presentation(required[0]).slides)} slides and 3 primary artifacts')
