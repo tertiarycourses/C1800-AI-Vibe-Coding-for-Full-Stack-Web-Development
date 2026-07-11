@@ -272,6 +272,87 @@ def build_ppt():
  bullets('Your repeatable practice','COURSE CLOSE',['Frame intent so success is observable','Plan before code and keep diffs reviewable','Inspect with human judgement','Verify with independent evidence','Correct deliberately and commit reversibly'])
  prs.save(OUT/f'{CODE} {TITLE}.pptx')
 
+# Reference-standard deck: mirrors the supplied n8n deck's five-slide lab rhythm.
+def build_ppt():
+ prs=Presentation(); prs.slide_width=I(13.333); prs.slide_height=I(7.5)
+ colors=[BLUE,TEAL,VIOLET,'F59E0B','E25555']; pales=['EAF2FF','ECFDF5','F3EEFF','FFF8E8','FFF4F4']
+ def rect(s,x,y,w,h,fill='FFFFFF',line='DCE5F0',radius=True):
+  q=s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE,I(x),I(y),I(w),I(h)); q.fill.solid(); q.fill.fore_color.rgb=C.from_string(fill); q.line.color.rgb=C.from_string(line); return q
+ def circle(s,x,y,d,fill,text,size=12):
+  q=s.shapes.add_shape(MSO_SHAPE.OVAL,I(x),I(y),I(d),I(d)); q.fill.solid(); q.fill.fore_color.rgb=C.from_string(fill); q.line.fill.background(); tb(s,x,y+d*.28,d,d*.35,text,size,True,'FFFFFF',PP_ALIGN.CENTER)
+ def base(kicker,title):
+  s=prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid(); s.background.fill.fore_color.rgb=C(255,255,255)
+  tb(s,.68,.3,11.7,.22,kicker.upper(),8,True,TEAL); tb(s,.68,.68,11.9,.82,title,18,True,INK)
+  s.shapes.add_shape(MSO_SHAPE.RECTANGLE,I(.68),I(6.94),I(11.95),I(.012)).fill.solid(); s.shapes[-1].fill.fore_color.rgb=C.from_string('DCE5F0'); s.shapes[-1].line.fill.background()
+  tb(s,.68,7.05,5.8,.14,f'{CODE} - {TITLE}',7,False,GREY); tb(s,5.3,7.05,4.8,.14,'Copyright 2026 Tertiary Infotech Academy Pte Ltd',7,False,GREY,PP_ALIGN.CENTER); tb(s,12.15,7.02,.4,.16,str(len(prs.slides)),7,False,GREY,PP_ALIGN.RIGHT); return s
+ def card(s,x,y,w,h,color,label,body,num=None):
+  rect(s,x,y,w,h,'FFFFFF','DCE5F0'); rect(s,x,y,.08,h,color,color,False)
+  if num is not None: circle(s,x+.23,y+.24,.42,color,str(num),9); ox=x+.78
+  else: ox=x+.3
+  tb(s,ox,y+.22,w-(ox-x)-.22,.26,label.upper(),9,True,color); tb(s,x+.3,y+.72,w-.6,h-.88,body,11,False,INK)
+ def loop_row(s,y=5.45):
+  names=['Define','Build','Observe','Evaluate','Improve']; xs=[.85,2.25,3.65,5.05,6.45]
+  for i,(x,n) in enumerate(zip(xs,names)):
+   circle(s,x,y,.38,TEAL if i==4 else BLUE,str(i+1),8); tb(s,x-.2,y+.48,.78,.18,n,7,False,GREY,PP_ALIGN.CENTER)
+   if i<4:
+    ln=s.shapes.add_shape(MSO_SHAPE.CHEVRON,I(x+.45),I(y+.11),I(.8),I(.15)); ln.fill.solid(); ln.fill.fore_color.rgb=C.from_string('DCE5F0'); ln.line.fill.background()
+ def target_slide(tn,labno,name,goal,target,practice):
+  s=base('Lab Target',f'Lab {labno}: {name}')
+  rect(s,.72,1.55,7.75,4.45,'F5F8FC','DCE5F0'); circle(s,1.12,2.0,1.0,BLUE,labno,15)
+  tb(s,2.38,1.82,5.55,.25,'YOU WILL BUILD',9,True,BLUE); tb(s,2.38,2.32,5.45,1.35,goal,18,True,INK)
+  tb(s,2.38,4.0,5.2,.22,'DELIVERABLE',8,True,TEAL); tb(s,2.38,4.38,5.4,.8,practice,11,False,GREY)
+  entries=[('TIMEBOX','25-40 minutes guided practice','F59E0B'),('MODE','Plan → generate → inspect → verify',VIOLET),('EVIDENCE',f'Prompt, diff and checkpoint in {target}',TEAL)]
+  for i,(a,b,c) in enumerate(entries): card(s,8.8,1.66+i*1.42,3.85,1.18,c,a,b)
+  tb(s,.78,6.3,7.8,.25,'Success is demonstrated through visible evidence and learner explanation.',10,True,VIOLET)
+ def ideas_slide(labno,name,goal,target,practice):
+  s=base('Concept Map',f'Lab {labno}: Four Ideas That Make It Work')
+  ideas=[('Outcome boundary',goal),('Primary target',target),('Engineering practice',practice),('Independent evidence','A changed boundary condition plus a repeatable verification result.')]
+  pos=[(.72,1.55),(6.75,1.55),(.72,3.78),(6.75,3.78)]
+  for i,((label,body),(x,y)) in enumerate(zip(ideas,pos)): card(s,x,y,5.85,1.85,colors[i],label,body,i+1)
+  tb(s,.78,6.18,9.2,.22,'Connect the four ideas before touching the implementation.',9,False,GREY)
+ def sequence_slide(labno,name,goal,target,practice):
+  s=base('Workflow Plan',f'Lab {labno}: Build Sequence'); steps=lab_steps(labno,name,goal,target,practice)
+  selected=[steps[0],steps[2],steps[4],steps[5],steps[6],steps[9]]; pos=[(.72,1.52),(6.75,1.52),(.72,2.86),(6.75,2.86),(.72,4.2),(6.75,4.2)]
+  for i,((phase,detail),(x,y)) in enumerate(zip(selected,pos)):
+   rect(s,x,y,5.85,1.02,'FFFFFF','DCE5F0'); circle(s,x+.18,y+.22,.42,BLUE if i%2==0 else TEAL,str(i+1),8); tb(s,x+.78,y+.18,4.8,.22,phase,9,True,INK); tb(s,x+.78,y+.5,4.75,.35,detail,8,False,GREY)
+  tb(s,.78,5.74,8.8,.2,'Build one observable behaviour at a time; inspect before adding the next.',9,True,VIOLET)
+ def gate_slide(labno,name,goal,target,practice):
+  s=base('Quality Gate',f'Lab {labno}: Prove, Evaluate, Improve')
+  rect(s,.72,1.5,7.15,4.9,'F5F8FC','DCE5F0')
+  checks=[practice,'The diff stays within the declared target.','Lint, typecheck and focused tests pass.','One edge case is run and the correction is recorded.']
+  for i,x in enumerate(checks): circle(s,1.05,1.88+i*1.02,.38,TEAL,'✓',10); tb(s,1.65,1.84+i*1.02,5.75,.5,x,11,False,INK)
+  rect(s,8.2,1.5,4.4,4.9,'FFFFFF','DCE5F0'); tb(s,8.55,1.82,2.2,.2,'EVIDENCE STACK',8,True,BLUE)
+  for i,(a,b) in enumerate([('Input','Saved prompt'),('Trace','Reviewed diff'),('Output','Command result'),('Decision','Corrected assumption')]):
+   circle(s,8.55,2.35+i*.8,.34,VIOLET,str(i+1),7); tb(s,9.08,2.29+i*.8,1.05,.18,a,8,True,VIOLET); tb(s,10.25,2.29+i*.8,1.85,.25,b,8,False,GREY)
+  tb(s,8.55,5.63,.55,.18,'PASS',7,True,TEAL); rect(s,9.25,5.67,2.55,.12,TEAL,TEAL)
+ def troubleshoot_slide(labno,name,goal,target,practice):
+  s=base('Troubleshooting',f'Lab {labno}: Diagnose Before Rebuilding')
+  headers=[('SYMPTOM','E25555'),('LIKELY CAUSE','F59E0B'),('TARGETED FIX',TEAL)]
+  for i,(h,c) in enumerate(headers): rect(s,.72+i*4.02,1.5,3.83,.45,c,c); tb(s,.72+i*4.02,1.64,3.83,.15,h,8,True,'FFFFFF',PP_ALIGN.CENTER)
+  rows=[('Agent changes too much','Scope is broader than the named target','Stop, restore and authorise named files only.'),('Verification is inconsistent','Commands or data are not deterministic','Reset state and rerun the same narrow check.'),('Output looks correct but fails','The test misses the real system boundary','Exercise the actual boundary and add a regression test.')]
+  for r,row in enumerate(rows):
+   for c,txt in enumerate(row):
+    fill=['FFF4F4','FFF8E8','ECFDF5'][c]; rect(s,.72+c*4.02,2.1+r*1.14,3.83,.88,fill,'DCE5F0'); tb(s,.95+c*4.02,2.34+r*1.14,3.35,.38,txt,9,False,INK)
+  tb(s,.78,5.82,9.4,.22,'Change one variable, rerun the same test, and compare the trace.',9,True,VIOLET)
+ # Cover
+ s=prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid(); s.background.fill.fore_color.rgb=C(255,255,255)
+ tb(s,.68,.36,5,.2,'TERTIARY INFOTECH ACADEMY',8,True,TEAL); tb(s,.68,1.15,6.1,1.35,TITLE,27,True,INK); tb(s,.68,3.03,5.8,.55,'Agentic AI loop engineering for adult full-stack training',14,False,GREY); tb(s,.68,5.55,5.8,.25,f'{CODE}  |  Version 3.0  |  UEN 201200696W',9,False,GREY)
+ rect(s,7.25,.7,5.35,5.75,'F5F8FC','DCE5F0'); nodes=[('FRONTEND',8.0,1.35,BLUE),('API',10.15,1.35,VIOLET),('DATA',8.0,3.2,TEAL),('DELIVERY',10.15,3.2,'F59E0B'),('REVIEW',9.08,4.9,'E25555')]
+ for label,x,y,c in nodes: circle(s,x,y,.82,c,''); tb(s,x-.15,y+.95,1.12,.2,label,8,True,c,PP_ALIGN.CENTER)
+ # Outcomes + loop
+ s=base('Course Outcomes','What You Will Be Able to Build')
+ outs=[('AGENT CONTEXT','Goals, constraints and durable instructions'),('FULL STACK','React, Express, SQLite and shared types'),('QUALITY','Tests, accessibility and safe errors'),('DELIVERY','CI/CD, containers and rollback'),('ORCHESTRATION','Skills, subagents and MCP tools')]
+ for i,(label,body) in enumerate(outs): card(s,.72+(i%3)*4.02,1.55+(i//3)*2.0,3.82,1.55,colors[i],label,body,i+1)
+ s=base('Engineering Method','The Agentic AI Loop'); loop_row(s,2.3); tb(s,.82,3.35,11.1,.75,'Define the outcome. Build a small increment. Observe the trace. Evaluate against evidence. Improve deliberately.',17,True,INK,PP_ALIGN.CENTER); rect(s,2.1,4.55,9.0,.85,'F5F8FC','DCE5F0'); tb(s,2.45,4.83,8.3,.25,'Every revision must leave the repository easier to understand and safer to change.',11,False,GREY,PP_ALIGN.CENTER)
+ for tn,topic,concepts,labs in topics:
+  s=base(f'Topic {tn}',f'Topic {tn} - {topic}'); rect(s,.72,1.55,8.0,2.55,'F5F8FC','DCE5F0'); tb(s,1.0,1.9,7.4,1.05,'; '.join(concepts)+'.',13,False,INK); tb(s,11.0,1.45,1.2,.7,tn,42,True,'E8EEF6',PP_ALIGN.CENTER); loop_row(s,4.55); rect(s,9.45,4.25,3.1,1.75,'FFFFFF','DCE5F0'); tb(s,9.77,4.5,1.2,.18,'LEARNING ARC',7,True,VIOLET); tb(s,9.77,4.87,2.2,.8,'Concept\nPractice\nEvidence\nReflection',10,True,INK)
+  for labno,name,goal,target,practice in labs:
+   target_slide(tn,labno,name,goal,target,practice); ideas_slide(labno,name,goal,target,practice); sequence_slide(labno,name,goal,target,practice); gate_slide(labno,name,goal,target,practice); troubleshoot_slide(labno,name,goal,target,practice)
+ s=base('Course Close','Build with Evidence. Operate with Confidence.'); rect(s,1.05,1.7,11.2,3.7,'F5F8FC','DCE5F0'); tb(s,1.55,2.2,10.2,.5,'A polished output is only the beginning.',20,True,INK,PP_ALIGN.CENTER); tb(s,1.65,3.1,10.0,.65,'Professional full-stack systems are observable, testable, guarded, recoverable, and documented.',14,False,GREY,PP_ALIGN.CENTER)
+ for i,x in enumerate(['TRACE','TEST','REVIEW','RECOVER','DOCUMENT']): rect(s,2.0+i*1.85,4.35,1.55,.42,colors[i],colors[i]); tb(s,2.0+i*1.85,4.48,1.55,.15,x,7,True,'FFFFFF',PP_ALIGN.CENTER)
+ tb(s,5.0,5.95,3.3,.2,'www.tertiarycourses.com.sg',8,True,BLUE,PP_ALIGN.CENTER)
+ prs.save(OUT/f'{CODE} {TITLE}.pptx')
+
 def build_lp():
  d=base_doc('Lesson Plan — Agentic AI Loop Engineering')
  d.add_heading('Course Information',0); para(d,'Intermediate | 2 days | 15 instructional hours | Instructor-led demonstration, guided practice and independent challenge')
