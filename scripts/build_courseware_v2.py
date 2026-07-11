@@ -175,14 +175,64 @@ def tb(slide,x,y,w,h,text,size=22,bold=False,color=INK,align=PP_ALIGN.LEFT):
  b=slide.shapes.add_textbox(I(x),I(y),I(w),I(h)); f=b.text_frame; f.clear(); f.word_wrap=True; p=f.paragraphs[0]; p.alignment=align; r=p.add_run(); r.text=text; r.font.name='Arial'; r.font.size=P(size); r.font.bold=bold; r.font.color.rgb=C.from_string(color); return b
 def build_ppt():
  prs=Presentation(); prs.slide_width=I(13.333); prs.slide_height=I(7.5)
+ palette=[BLUE,TEAL,VIOLET,'F59E0B','EF4444']
+ pale=['EAF2FF','E8F8F1','F1EAFE','FFF4CC','FDECEC']
+ def shape(s,kind,x,y,w,h,fill,line=None,radius=True):
+  q=s.shapes.add_shape(kind,I(x),I(y),I(w),I(h)); q.fill.solid(); q.fill.fore_color.rgb=C.from_string(fill); q.line.color.rgb=C.from_string(line or fill); return q
  def shell(title,kicker='COURSE'):
   s=prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid(); s.background.fill.fore_color.rgb=C(255,255,255)
   sh=s.shapes.add_shape(MSO_SHAPE.RECTANGLE,0,0,I(.14),prs.slide_height); sh.fill.solid(); sh.fill.fore_color.rgb=C.from_string(BLUE); sh.line.fill.background()
+  # subtle visual anchor and progress rail
+  shape(s,MSO_SHAPE.OVAL,11.85,-.32,1.15,1.15,'F1F6FF','F1F6FF'); shape(s,MSO_SHAPE.OVAL,12.42,.18,.42,.42,'D9F7EA','D9F7EA')
   tb(s,.65,.35,12,.3,kicker.upper(),11,True,TEAL); tb(s,.65,.78,12,1,title,28,True)
   tb(s,.65,7.12,11.7,.18,f'{TITLE} · {CODE}     © 2026 Tertiary Infotech Academy Pte Ltd',8,False,GREY); tb(s,12.25,7.08,.4,.2,str(len(prs.slides)),8,False,GREY,PP_ALIGN.RIGHT); return s
  def bullets(title,kicker,items):
-  s=shell(title,kicker); b=tb(s,.85,1.85,11.6,4.9,'',19,False,GREY); f=b.text_frame; f.clear()
-  for i,x in enumerate(items[:5]): p=f.paragraphs[0] if i==0 else f.add_paragraph(); p.text='• '+x; p.font.name='Arial'; p.font.size=P(19); p.font.color.rgb=C.from_string(GREY); p.space_after=P(12)
+  s=shell(title,kicker); items=items[:5]
+  # Prompt contracts and core loops become connected process diagrams.
+  if 'prompt contract' in title.lower() or 'agentic ai engineering loop' in title.lower() or 'repeatable practice' in title.lower():
+   n=len(items); gap=.16; w=(11.75-gap*(n-1))/n
+   for i,x in enumerate(items):
+    x0=.72+i*(w+gap); shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,x0,2.05,w,2.95,pale[i],palette[i])
+    shape(s,MSO_SHAPE.OVAL,x0+.15,2.28,.52,.52,palette[i]); tb(s,x0+.15,2.4,.52,.2,str(i+1),11,True,'FFFFFF',PP_ALIGN.CENTER)
+    parts=x.split(' — ',1); tb(s,x0+.18,2.95,w-.36,.48,parts[0],15,True,palette[i],PP_ALIGN.CENTER)
+    if len(parts)>1: tb(s,x0+.18,3.52,w-.36,1.16,parts[1],11,False,GREY,PP_ALIGN.CENTER)
+    if i<n-1: shape(s,MSO_SHAPE.CHEVRON,x0+w-.02,3.18,.28,.48,'BFD4F7','BFD4F7')
+  # Procedures use numbered action cards instead of dense bullets.
+  elif title.lower().startswith('procedure'):
+   positions=[(.75,1.85,5.75,2.05),(6.75,1.85,5.75,2.05),(.75,4.08,5.75,2.05),(6.75,4.08,5.75,2.05)]
+   for i,x in enumerate(items):
+    px,py,pw,ph=positions[i]; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,px,py,pw,ph,'FFFFFF','D7E3F5')
+    shape(s,MSO_SHAPE.RECTANGLE,px,py,.12,ph,palette[i]); m=re.match(r'(\d+)\. ([^—]+)—\s*(.*)',x)
+    num,head,body=(m.group(1),m.group(2).strip(),m.group(3).strip()) if m else (str(i+1),'ACTION',x)
+    shape(s,MSO_SHAPE.OVAL,px+.25,py+.24,.55,.55,palette[i]); tb(s,px+.25,py+.37,.55,.2,num,11,True,'FFFFFF',PP_ALIGN.CENTER)
+    tb(s,px+.95,py+.22,pw-1.2,.38,head,15,True,palette[i]); tb(s,px+.28,py+.94,pw-.56,.88,body,12,False,GREY)
+  # Lab overview becomes a goal panel plus a build/evidence stack.
+  elif 'lab overview' in kicker.lower():
+   shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,.72,1.78,5.15,4.72,'EAF2FF',BLUE); tb(s,1.02,2.05,1.4,.25,'YOUR MISSION',11,True,BLUE); tb(s,1.02,2.55,4.55,2.2,items[0],22,True,INK); tb(s,1.02,5.35,4.4,.35,'BUILD A VERIFIED INCREMENT',12,True,TEAL)
+   labels=['TARGET','BUILD','EVIDENCE','TRANSFER']
+   for i,x in enumerate(items[1:5]):
+    y=1.78+i*1.14; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,6.15,y,6.35,.96,'FFFFFF','D7E3F5'); shape(s,MSO_SHAPE.RECTANGLE,6.15,y,.11,.96,palette[i]); tb(s,6.45,y+.15,1.05,.22,labels[i],10,True,palette[i]); tb(s,7.48,y+.12,4.7,.54,x,13,False,INK)
+  # Verification slides are visual checklists.
+  elif 'expected result' in title.lower() or 'release review' in title.lower():
+   shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,.72,1.78,3.05,4.75,'E8F8F1',TEAL); shape(s,MSO_SHAPE.OVAL,1.53,2.35,1.4,1.4,TEAL); tb(s,1.53,2.72,1.4,.5,'✓',34,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,1.05,4.18,2.38,.8,'EVIDENCE\nBEATS CONFIDENCE',16,True,TEAL,PP_ALIGN.CENTER)
+   for i,x in enumerate(items):
+    y=1.82+i*.9; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,4.05,y,8.43,.7,'FFFFFF','D7E3F5'); shape(s,MSO_SHAPE.OVAL,4.28,y+.15,.38,.38,TEAL); tb(s,4.28,y+.23,.38,.16,'✓',10,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,4.85,y+.13,7.25,.35,x,14,False,INK)
+  # Troubleshooting is a diagnostic path.
+  elif 'troubleshoot' in title.lower() or 'failure pattern' in title.lower():
+   for i,x in enumerate(items):
+    y=1.82+i*.9; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,1.15,y,10.85,.68,pale[i],palette[i]); shape(s,MSO_SHAPE.OVAL,.55,y+.05,.58,.58,palette[i]); tb(s,.55,y+.19,.58,.2,str(i+1),11,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,1.45,y+.13,10.2,.36,x,15,False,INK)
+    if i<len(items)-1: shape(s,MSO_SHAPE.DOWN_ARROW,.78,y+.66,.16,.25,'BFD4F7','BFD4F7')
+  # Architecture and concept maps use a connected system view.
+  elif 'architecture' in title.lower() or 'concept map' in title.lower():
+   n=len(items); w=2.08
+   for i,x in enumerate(items):
+    x0=.65+i*2.48; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,x0,2.25,w,2.65,pale[i],palette[i]); tb(s,x0+.18,2.57,w-.36,.35,f'{i+1:02d}',13,True,palette[i]); tb(s,x0+.18,3.14,w-.36,1.18,x,15,True,INK,PP_ALIGN.CENTER)
+    if i<n-1: shape(s,MSO_SHAPE.CHEVRON,x0+w+.08,3.23,.3,.55,'BFD4F7','BFD4F7')
+  # General concept slides use a varied card grid.
+  else:
+   positions=[(.72,1.82,3.72,2.0),(4.8,1.82,3.72,2.0),(8.88,1.82,3.72,2.0),(2.76,4.18,3.72,2.0),(6.84,4.18,3.72,2.0)] if len(items)>=5 else [(.75,1.95,5.75,1.85),(6.75,1.95,5.75,1.85),(.75,4.15,5.75,1.85),(6.75,4.15,5.75,1.85)]
+   for i,x in enumerate(items):
+    px,py,pw,ph=positions[i]; shape(s,MSO_SHAPE.ROUNDED_RECTANGLE,px,py,pw,ph,'FFFFFF','D7E3F5'); shape(s,MSO_SHAPE.RECTANGLE,px,py,pw,.1,palette[i]); shape(s,MSO_SHAPE.OVAL,px+.2,py+.28,.46,.46,palette[i]); tb(s,px+.2,py+.39,.46,.18,str(i+1),10,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,px+.82,py+.27,pw-1.05,1.15,x,14,True if len(x)<70 else False,INK)
  def step(title,kicker,n,text):
   s=shell(title,kicker); c=s.shapes.add_shape(MSO_SHAPE.OVAL,I(.75),I(2),I(1.15),I(1.15)); c.fill.solid(); c.fill.fore_color.rgb=C.from_string(BLUE); c.line.fill.background(); tb(s,.75,2.27,1.15,.5,str(n),24,True,'FFFFFF',PP_ALIGN.CENTER); tb(s,2.25,1.95,9.8,3.2,text,23,True if n==1 else False,INK)
  s=prs.slides.add_slide(prs.slide_layouts[6]); s.background.fill.solid(); s.background.fill.fore_color.rgb=C(255,255,255)
