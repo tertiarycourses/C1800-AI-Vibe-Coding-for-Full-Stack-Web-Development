@@ -1,57 +1,59 @@
-# C1800 — AI Vibe Coding for Full Stack Web Development
+# AI Vibe Coding for Full Stack Web Development
 
-[![Course](https://img.shields.io/badge/course-C1800-1F6FEB)](https://www.tertiarycourses.com.sg/vibe-coding-for-full-stack-web-development.html)
-[![Duration](https://img.shields.io/badge/duration-2%20days%20%7C%2015%20hours-10B981)](#courseware)
-[![Format](https://img.shields.io/badge/format-non--WSQ-161B26)](#courseware)
+Build and review a React, Express and SQLite task board using a human-led AI coding workflow.
 
-Complete non-WSQ courseware for a practical, intermediate programme on building and shipping full-stack web applications with AI coding agents.
+| Course detail | Information |
+|---|---|
+| Course code | `C1800` |
+| Programme | Non-WSQ |
+| Duration | 2 days, 15 hours (9:30am – 5:30pm) |
+| Registration | [View course details and register](https://www.tertiarycourses.com.sg/ai-vibe-coding-for-full-stack-web-development.html) |
 
-![C1800 courseware preview](screenshot.png)
+## About the course
 
-## Courseware
+Learners turn requirements into a working full-stack application while keeping human responsibility for architecture, data ownership, API contracts, security, testing and release checks. The current package is version 12.0 (14 September 2026).
 
-- 158-slide PowerPoint deck following the supplied Tertiary five-slide lab standard across 30 guided labs
-- Detailed 28,000+ word Learner Guide in DOCX and Markdown
-- Two-day Lesson Plan totalling 15 instructional hours
-- Thirty standalone lab sheets that progressively build the TaskFlow capstone
-- Reusable, isolated `non-wsq-*` skills, commands, hooks and agents
+## Learning outcomes
 
-## Learning journey
+- Design a simple application interface and an acceptance contract.
+- Build dynamic, responsive React interfaces.
+- Implement interactive controls and application features.
+- Compose reusable components and connect a full-stack architecture.
+- Build forms, manage data and produce delivery documentation.
 
-```mermaid
-flowchart LR
-  A["Agent-ready context"] --> B["Frontend + API"]
-  B --> C["Data + tests"]
-  C --> D["Production build"]
-  D --> E["CI/CD gates"]
-  E --> F["Skills + subagents"]
-  F --> G["MCP orchestration"]
-```
+## Topics covered
 
-## Project structure
+1. Designing full-stack applications with AI vibe coding.
+2. Building dynamic and responsive user interfaces.
+3. Creating interactive controls and application features.
+4. Developing reusable components and full-stack architecture.
+5. Building forms, managing data and producing documentation.
 
-```text
-courseware/          Generated PPT and DOCX deliverables
-labs/                Eight learner lab sheets grouped by topic
-scripts/             Reproducible courseware generator
-.codex/skills/       Project-scoped non-WSQ Codex skills
-.claude/             Project-scoped commands, hooks and agents
-LEARNER-GUIDE.md     Searchable learner-guide source
-```
+## Labs
 
-## Regenerate and validate
+Each lab is a standalone React project with scripts, a package manifest, mock data, tests and a printable guide. Labs 8–10 include an Express API; Labs 9–10 demonstrate SQLite persistence.
 
-```bash
-python3 scripts/build_courseware.py
-python3 .claude/hooks/non-wsq-courseware-post-hook.py .
-```
+1. [Requirements and architecture](labs/lab-01-requirements-and-architecture/README.md)
+2. [React scaffold](labs/lab-02-react-scaffold/README.md)
+3. [Responsive task board](labs/lab-03-responsive-task-board/README.md)
+4. [State and controls](labs/lab-04-state-and-controls/README.md)
+5. [Forms and validation](labs/lab-05-forms-and-validation/README.md)
+6. [Search and asynchronous state](labs/lab-06-search-and-async/README.md)
+7. [Reusable components](labs/lab-07-components-and-props/README.md)
+8. [Express API](labs/lab-08-express-api/README.md)
+9. [Persistence and query safety](labs/lab-09-sqlite-persistence/README.md)
+10. [Security, tests and release](labs/lab-10-security-tests-and-release/README.md)
 
-Requires Python 3 with `python-docx`, `python-pptx` and Pillow.
+## Public package
 
-## Source syllabus
+The [`courseware/`](courseware/) folder contains the current (v12.0) package:
 
-The structure follows the published [C1800 course page](https://www.tertiarycourses.com.sg/vibe-coding-for-full-stack-web-development.html): vibe-coding principles, frontend/backend implementation, cloud and CI/CD, and agent skills/subagents/MCP.
+- Trainer slides: [PPTX](courseware/AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development-v12.0.pptx) · learner slides: [PDF](courseware/AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development-v12.0.pdf)
+- Learner Guide: [DOCX](courseware/LG-AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development.docx) · [PDF](courseware/LG-AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development.pdf) · [Markdown](courseware/LG-AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development.md)
+- Lesson Plan: [DOCX](courseware/LP-AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development.docx) · [PDF](courseware/LP-AI%20Vibe%20Coding%20for%20Full%20Stack%20Web%20Development.pdf)
 
-## Credits
+Detailed procedures are in the Learner Guide and lab guides. The examples use invented task data.
 
-Developed for Tertiary Infotech Academy Pte Ltd. © 2026. All rights reserved.
+Source references, credentials and build tooling are private and are not part of this public repository.
+
+Course provider: Tertiary Infotech Academy Pte Ltd · UEN 201200696W.

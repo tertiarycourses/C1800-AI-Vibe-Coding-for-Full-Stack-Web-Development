@@ -1,0 +1,4 @@
+tasks.sqlite
+.env
+node_modules/
+dist/

@@ -1,0 +1,6 @@
+*{box-sizing:border-box}body{margin:0;background:#f4f8fb;color:#173044;font:16px system-ui}
+main{max-width:1100px;margin:auto;padding:clamp(1rem,3vw,3rem)}header{background:#fff;border-left:8px solid #008f87;padding:1.5rem;margin-bottom:1rem}
+.eyebrow{color:#1763a6;font-size:.75rem;font-weight:700;letter-spacing:.18em}h1{margin:.2rem 0}
+form,.card{background:white;border:1px solid #d8e4ed;padding:1rem;border-radius:.5rem}form{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem}
+input:not([type=checkbox]){min-height:2.6rem;padding:.5rem;border:1px solid #698094;border-radius:.25rem}button{background:#1763a6;color:white;border:0;padding:.8rem 1rem;border-radius:.25rem;cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #e28a19;outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem;margin-top:1rem}.card{display:flex;flex-direction:column;gap:1rem}.card small{color:#536677}[role=alert]{color:#b03232}

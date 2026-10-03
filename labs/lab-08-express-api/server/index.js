@@ -1,0 +1,13 @@
+import express from 'express';
+import seed from '../mock-data/tasks.json' with {type:'json'};
+const app=express();app.use(express.json());let tasks=structuredClone(seed);
+app.get('/api/tasks',(req,res)=>res.json({tasks}));
+app.post('/api/tasks',(req,res)=>{const title=String(req.body?.title??'').trim();
+ if(!title||title.length>120)return res.status(400).json({error:'INVALID_TITLE'});
+ const task={id:crypto.randomUUID(),title,done:false,ownerId:'learner-1'};
+ tasks.unshift(task);res.status(201).json(task);});
+app.patch('/api/tasks/:id',(req,res)=>{const task=tasks.find(x=>x.id===req.params.id);
+ if(!task)return res.status(404).json({error:'NOT_FOUND'});
+ if(typeof req.body?.done!=='boolean')return res.status(400).json({error:'INVALID_DONE'});
+ task.done=req.body.done;res.json(task);});
+app.listen(3001,()=>console.log('API http://localhost:3001'));
